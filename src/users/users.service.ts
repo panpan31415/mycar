@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Equal, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './users.entity';
 @Injectable()
@@ -32,5 +32,23 @@ export class UsersService {
     const user = this.repo.create({ email, password });
     // save the instance to db
     return this.repo.save(user);
+  }
+
+  findOne(id: number) {
+    return this.repo.findOneBy({ id });
+  }
+
+  async find(email: string) {
+    return this.repo.findBy({ email: Equal(email) });
+  }
+
+  async update(id: number, attrs: Partial<User>) {
+    const user = await this.findOne(id);
+    return this.repo.save({ ...user, ...attrs });
+  }
+
+  async remove(id: number) {
+    const user = await this.findOne(id);
+    return this.repo.remove(user);
   }
 }
