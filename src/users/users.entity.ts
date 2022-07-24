@@ -12,8 +12,17 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  email: string;
   @Column()
+  email: string;
+
+  @Column()
+  // when an entity that returned by repository,
+  // we don't want password to be returned to client,
+  // so when, user controller turns user entity to an plain
+  // object, we use @Exclude decorator to trim password away from
+  // the plain user object
+  //@Exclude({ toPlainOnly: true })
+  // 
   password: string;
 
   //hook methods

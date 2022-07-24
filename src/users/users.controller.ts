@@ -8,10 +8,13 @@ import {
   Post,
   Query,
   NotFoundException,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UsersService } from './users.service';
+import { SerializeInterceptor } from 'src/interceptors/serialize.interceptor';
 @Controller('auth')
 export class UsersController {
   constructor(private userService: UsersService) {}
@@ -22,7 +25,7 @@ export class UsersController {
     this.userService.create(email, password);
   }
 
-  @Get('/:id')
+  @Delete('/:id')
   // anything saved in request is string, so id has a type of string
   async deleteUser(@Param('id') id: string) {
     try {
@@ -32,11 +35,13 @@ export class UsersController {
     }
   }
 
-  @Delete('/:id')
+  @UseInterceptors(SerializeInterceptor)
+  @Get('/:id')
   // anything saved in request is string, so id has a type of string
   async findUser(@Param('id') id: string) {
+    console.log('handler is running');
     try {
-      return await this.userService.remove(parseInt(id));
+      return await this.userService.findOne(parseInt(id));
     } catch (error) {
       throw new NotFoundException(`user with id ${id} is not found`);
     }
